@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#091423">
+  <meta name="description" content="HELLO CLOUD: descubre qué es la nube, AWS y sus principales servicios desde tu primera web publicada en Amazon EC2.">
+  <title>HELLO CLOUD | Mi primera web en AWS</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #091423;
+      --panel: #112236;
+      --panel-soft: #101f31;
+      --line: rgba(177,203,223,.17);
+      --ink: #f5f9ff;
+      --muted: #a7b9c9;
+      --amber: #ffb649;
+      --amber-light: #ffe0a6;
+      --aqua: #54e8d0;
+      --max: 1130px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(ellipse 45% 26% at 85% 5%, rgba(28,91,121,.24), transparent 80%),
+                  radial-gradient(ellipse 48% 20% at 8% 32%, rgba(26,66,105,.17), transparent 85%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a:focus-visible { outline: 3px solid var(--amber); outline-offset: 5px; border-radius: 5px; }
+    .wrap { width: min(calc(100% - 48px), var(--max)); margin: 0 auto; }
+    .nav-shell { border-bottom: 1px solid rgba(159,186,212,.10); }
+    .nav { height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; font-size: .88rem; font-weight: 900; letter-spacing: .11em; }
+    .brand-symbol { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid rgba(255,182,73,.45); background: rgba(255,182,73,.1); border-radius: 12px; color: var(--amber); }
+    .brand .brand-muted { font-weight: 500; color: var(--muted); letter-spacing: 0; font-size: .82rem; }
+    .nav-links { display: flex; gap: 26px; align-items: center; color: #bed0df; font-size: .88rem; font-weight: 600; }
+    .nav-links a:hover { color: var(--amber); }
+    .nav-live { display: flex; align-items: center; gap: 8px; color: #b5eeda; border: 1px solid rgba(84,232,208,.26); background: rgba(84,232,208,.075); font-size: .75rem; font-weight: 700; letter-spacing: .09em; padding: 8px 12px; border-radius: 999px; white-space: nowrap; }
+    .pulse { width: 7px; height: 7px; border-radius: 100%; background: var(--aqua); box-shadow: 0 0 0 4px rgba(84,232,208,.14); }
+    .hero { min-height: 610px; padding: 94px 0 95px; position: relative; display: grid; grid-template-columns: minmax(0,1.14fr) minmax(320px,.86fr); align-items: center; gap: 15px; }
+    .kicker { display: inline-flex; align-items: center; gap: 12px; text-transform: uppercase; letter-spacing: .18em; font-size: .76rem; font-weight: 800; color: var(--amber-light); }
+    .kicker::before { content: ""; display: block; width: 23px; height: 2px; background: var(--amber); }
+    .hero h1 { margin: 20px 0 23px; font-size: clamp(5.2rem, 10.5vw, 9.15rem); line-height: .84; letter-spacing: -.089em; font-weight: 950; text-transform: uppercase; }
+    .hero h1 span { display: block; }
+    .hero h1 .accent { color: var(--amber); text-shadow: 0 15px 80px rgba(255,158,30,.18); }
+    .hero-lead { margin: 0; max-width: 520px; font-size: 1.15rem; color: #b3c5d6; line-height: 1.75; }
+    .hero-lead strong { color: white; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .btn { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border-radius: 9px; padding: 12px 22px; font-size: .9rem; font-weight: 800; transition: transform .2s ease, background .2s ease; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-main { background: var(--amber); color: #142031; box-shadow: 0 12px 35px rgba(255,182,73,.15); }
+    .btn-main:hover { background: #ffca77; }
+    .btn-outline { border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+    .btn-outline:hover { background: rgba(255,255,255,.08); }
+    .hero-visual { position: relative; min-height: 400px; display: grid; place-items: center; }
+    .halo { position: absolute; width: 370px; height: 370px; border-radius: 50%; background: radial-gradient(circle, rgba(66,167,185,.23) 0, rgba(66,167,185,.035) 51%, transparent 72%); filter: blur(8px); }
+    .orbit { width: 336px; height: 336px; position: relative; display: grid; place-items: center; border: 1px dashed rgba(133,192,209,.34); border-radius: 50%; transform: rotate(-7deg); }
+    .orbit::after { content: ""; position: absolute; inset: 42px; border-radius: 50%; border: 1px solid rgba(129,191,210,.18); }
+    .big-cloud { width: 225px; height: 225px; filter: drop-shadow(0 28px 38px rgba(2,7,14,.25)); transform: rotate(7deg); }
+    .orbit-chip { position: absolute; z-index: 2; padding: 11px 15px; background: rgba(15,35,54,.98); border: 1px solid rgba(136,197,208,.35); border-radius: 10px; color: #d7f3f4; font-size: .8rem; font-weight: 800; box-shadow: 0 16px 38px rgba(0,0,0,.2); transform: rotate(7deg); }
+    .chip-one { left: -25px; top: 78px; }
+    .chip-two { right: -33px; top: 92px; }
+    .chip-three { bottom: 19px; right: 4px; border-color: rgba(255,182,73,.3); color: var(--amber-light); }
+    .float-dot { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: var(--amber); }
+    .dot-one { right: 18px; top: 17px; }
+    .dot-two { left: 2px; bottom: 26px; background: var(--aqua); }
+    .strip { border-block: 1px solid var(--line); background: rgba(15,33,50,.72); }
+    .strip-inner { display: flex; flex-wrap: wrap; gap: 18px 26px; align-items: center; justify-content: space-between; padding: 18px 0; font-size: .84rem; font-weight: 600; color: #bbcad9; }
+    .strip-inner b { color: var(--amber); font-weight: 900; }
+    .section { padding: 96px 0 16px; }
+    .section-kicker { display: block; font-size: .75rem; letter-spacing: .2em; color: var(--aqua); text-transform: uppercase; font-weight: 900; margin-bottom: 13px; }
+    .section h2 { font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.1; letter-spacing: -.05em; margin: 0 0 18px; }
+    .section-desc { color: var(--muted); max-width: 700px; font-size: 1.08rem; margin: 0 0 38px; }
+    .definition { display: grid; grid-template-columns: 1.3fr 1fr; gap: 30px; padding: 32px; border-radius: 18px; border: 1px solid rgba(255,182,73,.23); background: linear-gradient(120deg,rgba(255,182,73,.085),rgba(255,182,73,.015)); }
+    .definition p { margin: 0; font-size: 1.08rem; color: #d7e4ef; }
+    .definition strong { color: white; }
+    .definition-aside { display: grid; align-content: center; gap: 8px; border-left: 1px solid var(--line); padding-left: 27px; }
+    .definition-aside span { font-size: .76rem; letter-spacing: .12em; color: var(--amber); font-weight: 900; text-transform: uppercase; }
+    .definition-aside p { color: #cad9e7; font-size: 1rem; }
+    .features { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 17px; margin-top: 20px; }
+    .feature, .service { background: linear-gradient(145deg,rgba(21,43,64,.82),rgba(13,28,44,.9)); border: 1px solid var(--line); border-radius: 15px; padding: 25px; }
+    .feature .icon-round { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 11px; color: var(--amber); background: rgba(255,182,73,.1); font-size: 1.3rem; margin-bottom: 22px; }
+    .feature h3, .service h3 { font-size: 1.1rem; margin: 0 0 7px; letter-spacing: -.02em; }
+    .feature p, .service p { color: var(--muted); font-size: .92rem; margin: 0; }
+    .service-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 17px; }
+    .service { transition: transform .2s ease, border-color .2s ease; min-height: 202px; }
+    .service:hover { transform: translateY(-3px); border-color: rgba(255,182,73,.43); }
+    .service-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .service-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 11px; background: rgba(84,232,208,.085); color: var(--aqua); font-size: 1.35rem; }
+    .service-num { color: #647b90; font-weight: 800; font-size: .79rem; letter-spacing: .1em; }
+    .service h3 { color: #fff; font-size: 1.12rem; }
+    .service h3 span { color: var(--amber); }
+    .architecture { margin-top: 10px; background: #0d1c2d; border: 1px solid var(--line); border-radius: 18px; padding: 32px; }
+    .steps { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 11px; }
+    .step { position: relative; min-height: 136px; background: rgba(255,255,255,.027); border: 1px solid var(--line); border-radius: 12px; padding: 20px 15px; }
+    .step:not(:last-child)::after { content: '→'; position: absolute; z-index: 2; right: -15px; top: 40px; color: var(--amber); background: #0d1c2d; border-radius: 30px; padding: 3px 6px; font-size: 22px; font-weight: 900; }
+    .step small { color: var(--aqua); font-size: .75rem; font-weight: 900; letter-spacing: .1em; }
+    .step h3 { margin: 10px 0 3px; font-size: 1.02rem; }
+    .step p { margin: 0; font-size: .8rem; color: var(--muted); }
+    .terminal { margin-top: 24px; overflow: hidden; border: 1px solid rgba(142,192,207,.2); border-radius: 12px; background: #060f1b; }
+    .terminal-head { padding: 12px 16px; background: #132439; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--line); }
+    .terminal-head .round { width: 10px; height: 10px; border-radius: 50%; background: #ec7273; }
+    .terminal-head .round:nth-child(2) { background: #ffce67; }
+    .terminal-head .round:nth-child(3) { background: #55c8ab; }
+    .terminal-head span:last-child { margin-left: 9px; color: #91a7bb; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .75rem; }
+    .terminal pre { margin: 0; padding: 20px; overflow-x: auto; color: #d4e6f4; font-size: .85rem; line-height: 1.8; }
+    .terminal code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .prompt { color: #68ebcd; }
+    .cmd-note { color: #7d95ae; }
+    .highlight { color: #ffd18d; }
+    .closing { margin: 86px 0 70px; border-radius: 20px; padding: 47px; border: 1px solid rgba(255,182,73,.3); background: radial-gradient(circle at 90% 15%,rgba(255,182,73,.13),transparent 44%),linear-gradient(120deg,#12253a,#0d1d2f); }
+    .closing h2 { font-size: clamp(2rem, 4vw, 3.7rem); letter-spacing: -.055em; line-height: 1.05; margin: 0 0 17px; }
+    .closing h2 span { color: var(--amber); }
+    .closing p { max-width: 680px; color: #b8cad9; font-size: 1.08rem; margin: 0 0 28px; }
+    .closing-tasks { display: flex; flex-wrap: wrap; gap: 10px; }
+    .closing-tasks span { color: #d9e9f3; font-size: .83rem; font-weight: 700; background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 999px; padding: 8px 13px; }
+    .closing-tasks b { color: var(--aqua); }
+    footer { border-top: 1px solid var(--line); padding: 26px 0 34px; }
+    .foot { display: flex; justify-content: space-between; gap: 14px; color: #879bb0; font-size: .82rem; }
+    .foot strong { color: #cddae6; }
+    @media (max-width: 920px) {
+      .hero { grid-template-columns: 1fr; padding: 74px 0 72px; gap: 10px; }
+      .hero-visual { min-height: 340px; }
+      .hero h1 { font-size: clamp(5rem, 16vw, 9rem); }
+      .features, .service-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .definition { grid-template-columns: 1fr; }
+      .definition-aside { border-left: none; border-top: 1px solid var(--line); padding: 20px 0 0; }
+    }
+    @media (max-width: 630px) {
+      .wrap { width: min(calc(100% - 34px), var(--max)); }
+      .nav { height: 69px; }
+      .brand-muted { display: none; }
+      .nav-links { display: none; }
+      .nav-live { font-size: .68rem; }
+      .hero { padding: 62px 0 48px; }
+      .hero h1 { font-size: clamp(4.35rem, 18.2vw, 7rem); margin-top: 16px; }
+      .hero-lead { font-size: 1rem; }
+      .hero-visual { min-height: 295px; }
+      .orbit { width: 250px; height: 250px; }
+      .orbit::after { inset: 30px; }
+      .big-cloud { width: 172px; height: 172px; }
+      .halo { width: 260px; height: 260px; }
+      .chip-one { left: -21px; top: 52px; }
+      .chip-two { right: -25px; top: 71px; }
+      .chip-three { right: -9px; bottom: 3px; }
+      .orbit-chip { font-size: .69rem; padding: 9px 10px; }
+      .section { padding: 75px 0 10px; }
+      .features, .service-grid, .steps { grid-template-columns: 1fr; }
+      .definition, .architecture { padding: 23px; }
+      .step { min-height: auto; }
+      .step:not(:last-child)::after { content: '↓'; top: auto; bottom: -22px; left: 48%; right: auto; }
+      .closing { padding: 28px 24px; margin-top: 65px; }
+      .foot { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn, .service { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="nav-shell">
+    <header class="nav wrap">
+      <a href="#inicio" class="brand" aria-label="Ir al inicio">
+        <span class="brand-symbol" aria-hidden="true">☁</span>
+        <span>CLOUD<span style="color:var(--amber)">LAB</span></span>
+        <span class="brand-muted">/ AWS Workshop</span>
+      </a>
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="#nube">La nube</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#despliegue">Despliegue</a>
+      </nav>
+      <div class="nav-live"><span class="pulse" aria-hidden="true"></span> HELLO AWS</div>
+    </header>
+  </div>
+
+  <main id="inicio">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div>
+        <span class="kicker">Mi primera página en Amazon EC2</span>
+        <h1 id="hero-title"><span>HELLO</span><span class="accent">CLOUD.</span></h1>
+        <p class="hero-lead">No estás viendo un simple archivo HTML. Estás viendo una página que <strong>puede viajar desde GitHub hasta un servidor en la nube</strong> y llegar a un navegador mediante HTTP.</p>
+        <div class="actions">
+          <a class="btn btn-main" href="#nube">Explorar la nube <span aria-hidden="true">↗</span></a>
+          <a class="btn btn-outline" href="#despliegue">Ver cómo funciona <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="halo"></div>
+        <div class="orbit">
+          <span class="orbit-chip chip-one">☁ &nbsp; AWS</span>
+          <span class="orbit-chip chip-two">⌘ &nbsp; EC2</span>
+          <span class="orbit-chip chip-three">:80 &nbsp; HTTP</span>
+          <span class="float-dot dot-one"></span>
+          <span class="float-dot dot-two"></span>
+          <svg class="big-cloud" viewBox="0 0 240 240" role="img" aria-label="Ilustración de nube">
+            <defs>
+              <linearGradient id="cg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#7af5dc"/><stop offset="1" stop-color="#3aa9be"/></linearGradient>
+              <linearGradient id="shade" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#073350"/><stop offset="1" stop-color="#102b47"/></linearGradient>
+            </defs>
+            <path d="M66 172c-24 0-43-18-43-41 0-22 17-40 39-42 10-35 40-60 78-60 40 0 72 27 79 65 18 8 30 25 30 45 0 27-22 49-50 49H66z" transform="translate(0 -8) scale(.94) translate(7 11)" fill="url(#shade)" stroke="url(#cg)" stroke-width="3.4" stroke-linejoin="round"/>
+            <path d="M76 139l25 25 55-60" fill="none" stroke="#ffbd64" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="50" cy="110" r="3" fill="#86efdf"/><circle cx="185" cy="75" r="3" fill="#ffbd64"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <div class="strip" aria-label="Tecnologías utilizadas">
+      <div class="strip-inner wrap">
+        <span><b>01</b> &nbsp; GitHub</span>
+        <span><b>02</b> &nbsp; Linux</span>
+        <span><b>03</b> &nbsp; Amazon EC2</span>
+        <span><b>04</b> &nbsp; Nginx</span>
+        <span><b>05</b> &nbsp; HTTP :80</span>
+      </div>
+    </div>
+
+    <section class="section wrap" id="nube" aria-labelledby="cloud-heading">
+      <span class="section-kicker">01 / Primero lo importante</span>
+      <h2 id="cloud-heading">¿Qué es la computación en la nube?</h2>
+      <p class="section-desc">Es acceder bajo demanda a recursos informáticos a través de una red, sin tener que comprar y administrar toda la infraestructura física por tu cuenta.</p>
+      <div class="definition">
+        <p>Antes, para publicar una aplicación necesitabas <strong>un servidor propio</strong>, electricidad, conexión, mantenimiento y seguridad física. Con la nube puedes <strong>aprovisionar recursos en minutos</strong> y administrarlos de forma remota.</p>
+        <div class="definition-aside">
+          <span>¿Y qué es AWS?</span>
+          <p><strong>Amazon Web Services</strong> es una plataforma que ofrece servicios de computación, almacenamiento, redes, bases de datos y mucho más.</p>
+        </div>
+      </div>
+      <div class="features">
+        <article class="feature"><div class="icon-round" aria-hidden="true">↗</div><h3>Escalabilidad</h3><p>Aumentar o reducir recursos según la demanda de la aplicación.</p></article>
+        <article class="feature"><div class="icon-round" aria-hidden="true">◷</div><h3>Bajo demanda</h3><p>Crear recursos cuando se necesitan y dejar de usarlos cuando ya no hacen falta.</p></article>
+        <article class="feature"><div class="icon-round" aria-hidden="true">◎</div><h3>Alcance global</h3><p>Desplegar servicios en distintas regiones y acercarlos a tus usuarios.</p></article>
+      </div>
+    </section>
+
+    <section class="section wrap" id="servicios" aria-labelledby="services-heading">
+      <span class="section-kicker">02 / El ecosistema</span>
+      <h2 id="services-heading">Seis servicios AWS para empezar.</h2>
+      <p class="section-desc">AWS tiene muchos servicios. Estos seis son una buena puerta de entrada para entender cómo se construye una aplicación real.</p>
+      <div class="service-grid">
+        <article class="service"><div class="service-top"><div class="service-icon" aria-hidden="true">▣</div><span class="service-num">01</span></div><h3><span>EC2</span> · Cómputo</h3><p>Máquinas virtuales donde puedes instalar Linux y ejecutar aplicaciones o servidores web.</p></article>
+        <article class="service"><div class="service-top"><div class="service-icon" aria-hidden="true">▤</div><span class="service-num">02</span></div><h3><span>S3</span> · Almacenamiento</h3><p>Almacena objetos como imágenes, documentos, archivos y respaldos.</p></article>
+        <article class="service"><div class="service-top"><div class="service-icon" aria-hidden="true">♙</div><span class="service-num">03</span></div><h3><span>IAM</span> · Identidad</h3><p>Define quién puede acceder a AWS y qué acciones tiene permitido realizar.</p></article>
+        <article class="service"><div class="service-top"><div class="service-icon" aria-hidden="true">λ</div><span class="service-num">04</span></div><h3><span>Lambda</span> · Funciones</h3><p>Ejecuta código por eventos sin administrar directamente un servidor.</p></article>
+        <article class="service"><div class="service-top"><div class="service-icon" aria-hidden="true">▥</div><span class="service-num">05</span></div><h3><span>RDS</span> · Bases de datos</h3><p>Servicio administrado para motores de bases de datos relacionales.</p></article>
+        <article class="service"><div class="service-top"><div class="service-icon" aria-hidden="true">⌁</div><span class="service-num">06</span></div><h3><span>VPC</span> · Redes</h3><p>Crea redes virtuales y controla la conectividad entre tus recursos.</p></article>
+      </div>
+    </section>
+
+    <section class="section wrap" id="despliegue" aria-labelledby="deploy-heading">
+      <span class="section-kicker">03 / Lo construimos de verdad</span>
+      <h2 id="deploy-heading">¿Cómo llegó esta página hasta ti?</h2>
+      <p class="section-desc">Este es el camino que sigue tu proyecto desde el repositorio hasta el navegador de un visitante.</p>
+      <div class="architecture">
+        <div class="steps">
+          <div class="step"><small>PASO 01</small><h3>GitHub</h3><p>Guardamos el código fuente.</p></div>
+          <div class="step"><small>PASO 02</small><h3>EC2 + Git</h3><p>Clonamos los archivos en Linux.</p></div>
+          <div class="step"><small>PASO 03</small><h3>Nginx</h3><p>Publicamos el HTML en el puerto 80.</p></div>
+          <div class="step"><small>PASO 04</small><h3>Navegador</h3><p>Visitamos la IP pública usando HTTP.</p></div>
+        </div>
+        <div class="terminal" role="region" aria-label="Ejemplo de terminal de despliegue">
+          <div class="terminal-head"><span class="round"></span><span class="round"></span><span class="round"></span><span>ec2-user@hello-cloud</span></div>
+          <pre><code><span class="cmd-note"># Ejemplo: reemplaza TU-USUARIO por tu usuario de GitHub</span>
+<span class="prompt">$</span> git clone <span class="highlight">https://github.com/TU-USUARIO/hello-cloud-aws.git</span>
+<span class="prompt">$</span> sudo cp hello-cloud-aws/index.html /usr/share/nginx/html/index.html
+<span class="prompt">$</span> curl -I http://localhost
+<span class="highlight">HTTP/1.1 200 OK</span></code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="foot wrap"><span><strong>HELLO CLOUD</strong></div></footer>
+</body>
+</html>
